@@ -1,0 +1,9 @@
+/* F1 Race Management System — custom styles */
+body { background: #f5f5f5; font-family: 'Segoe UI', system-ui, sans-serif; }
+.navbar-brand { letter-spacing: 0.5px; }
+.card { border-radius: 8px; }
+.table th { font-weight: 600; }
+.jumbotron { background: linear-gradient(135deg, #B4121B 0%, #000000 100%); color: #fff; }
+.jumbotron h1 { color: #fff; }
+.jumbotron .lead { color: #fff; }
+.jumbotron .text-muted { color: #aaa !important; }

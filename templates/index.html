@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}F1 赛事管理系统 - 首页{% endblock %}
+{% block content %}
+<div class="jumbotron bg-light rounded-3 p-5 mb-4 text-center">
+    <h1 class="display-5 fw-bold">F1 世界一级方程式锦标赛</h1>
+    <p class="lead">赛事数据管理与查询系统</p>
+    <p class="text-muted">涵盖车队、车手、赛道、大奖赛、成绩与积分排名等功能模块</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-danger mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-people-fill display-4"></i>
+                <h5 class="card-title mt-2">车队管理</h5>
+                <p class="card-text">官方车队信息查询与管理</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-dark mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-person-badge display-4"></i>
+                <h5 class="card-title mt-2">车手管理</h5>
+                <p class="card-text">正式车手 + 储备车手体系</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-danger mb-3">
+            <div class="card-body text-center">
+                <i class="bi bi-trophy-fill display-4"></i>
+                <h5 class="card-title mt-2">赛事&成绩</h5>
+                <p class="card-text">分站赛管理与实时积分排名</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

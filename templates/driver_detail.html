@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ driver.driver_name }} - F1{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h4>{{ driver.driver_name }}</h4>
+                <p>车号: <strong>#{{ driver.driver_num }}</strong></p>
+                <p>国籍: {{ driver.driver_nation }}</p>
+                <p>车队: {{ driver.team_name }}</p>
+                {% if driver.driver_salary %}<p>薪资: ¥{{ driver.driver_salary }}万/年</p>{% endif %}
+                {% if driver.test_hours %}<p>测试时长: {{ driver.test_hours }} 小时</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h5>参赛记录</h5>
+        <table class="table table-sm table-striped">
+            <thead><tr><th>赛事</th><th>日期</th><th>赛季</th><th>名次</th><th>积分</th></tr></thead>
+            <tbody>{% for r in results %}<tr><td>{{ r.gp_name }}</td><td>{{ r.gp_date }}</td><td>{{ r.gp_season }}</td><td>{{ r.result_rank }}</td><td>{{ r.result_points }}</td></tr>{% endfor %}</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

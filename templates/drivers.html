@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}车手列表 - F1{% endblock %}
+{% block content %}
+<h3 class="border-bottom pb-2 mb-3">车手列表</h3>
+
+<!-- ======== 筛选栏 ======== -->
+<form class="row g-2 mb-3" method="get">
+    <div class="col-auto">
+        <select name="nation" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">全部国籍</option>
+            {% for n in nations %}
+            <option value="{{ n }}" {% if nation == n %}selected{% endif %}>{{ n }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto">
+        <div class="form-check form-switch pt-1">
+            <input class="form-check-input" type="checkbox" name="champion" value="1" id="championToggle" {% if champion_only == '1' %}checked{% endif %} onchange="this.form.submit()">
+            <label class="form-check-label small" for="championToggle">
+                仅显示冠军车手
+            </label>
+        </div>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('public.drivers') }}" class="btn btn-sm btn-outline-secondary">重置</a>
+    </div>
+    <div class="col-auto ms-auto">
+        <span class="badge bg-secondary align-middle">
+            {{ drivers|length }} / {{ all_drivers|length }} 名车手
+        </span>
+    </div>
+</form>
+
+<!-- ======== 车手表格 ======== -->
+<table class="table table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>车号</th><th>姓名</th><th>国籍</th><th>车队</th><th>类型</th><th>薪资/测试</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in drivers %}
+        <tr>
+            <td><strong>{{ d.driver_num }}</strong></td>
+            <td>
+                {% if d.driver_id in champion_ids %}<span title="分站冠军">🏆</span>{% endif %}
+                 <a href="{{ url_for('public.driver_detail', driver_id=d.driver_id) }}" class="text-dark text-decoration-none">{{ d.driver_name }}</a>
+            </td>
+            <td>
+                {% if nation and d.driver_nation == nation %}
+                <mark>{{ d.driver_nation }}</mark>
+                {% else %}
+                {{ d.driver_nation }}
+                {% endif %}
+            </td>
+            <td>{{ d.team_name }}</td>
+            <td>
+                {% if d.driver_type == '全职' %}
+                <span class="badge bg-primary-subtle text-primary">全职车手</span>
+                {% else %}
+                <span class="badge bg-secondary-subtle text-secondary">储备车手</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if d.driver_salary %}¥{{ d.driver_salary }}万/年
+                {% elif d.test_hours %}{{ d.test_hours }}h
+                {% else %}-{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

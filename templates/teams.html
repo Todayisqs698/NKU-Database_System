@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}车队列表 - F1{% endblock %}
+{% block content %}
+<h3 class="border-bottom pb-2 mb-3">车队列表</h3>
+
+<!-- ======== 筛选栏 ======== -->
+<form class="row g-2 mb-3" method="get">
+    <div class="col-auto">
+        <input name="leader" class="form-control form-control-sm" value="{{ leader }}"
+               placeholder="按领队搜索">
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-sm btn-dark">查询</button>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('public.teams') }}" class="btn btn-sm btn-outline-dark">重置</a>
+    </div>
+    <div class="col-auto ms-auto">
+        <span class="badge bg-light text-dark border align-middle">
+            {{ teams|length }} 支车队
+        </span>
+    </div>
+</form>
+
+<!-- ======== 车队卡片======== -->
+<div class="row">
+    {% for t in teams %}
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card h-100 rounded-0 border">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <!-- 链接改为深灰色，无彩色 -->
+                    <a href="{{ url_for('public.team_detail', team_id=t.team_id) }}" class="text-dark text-decoration-none">
+                        {{ t.team_name }}
+                    </a>
+                </h5>
+                <p class="card-text mb-1"><small>领队:
+                    {% if leader and leader.lower() in t.team_leader.lower() %}
+                    <mark class="bg-light text-dark">{{ t.team_leader }}</mark>
+                    {% else %}
+                    {{ t.team_leader }}
+                    {% endif %}
+                </small></p>
+                <p class="card-text mb-2"><small>总部: {{ t.team_address }}</small></p>
+
+                <!-- 极简积分样式：无彩色，仅边框文字 -->
+                {% set pts = team_points.get(t.team_name) %}
+                <span class="badge bg-light text-dark border">
+                    赛季积分: {{ pts if pts is not none else 0 }}
+                </span>
+
+                <!-- 旗下车手列表 -->
+                {% set drivers = team_drivers.get(t.team_id, []) %}
+                {% if drivers %}
+                <ul class="list-unstyled mt-2 mb-0 small text-muted">
+                    {% for d in drivers %}
+                    <li>🏎️ #{{ d.driver_num }} {{ d.driver_name }}
+                        <span>({{ d.driver_nation }})</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

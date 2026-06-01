@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}系统管理 - F1{% endblock %}
+{% block content %}
+<h3 class="border-bottom pb-2 mb-3"><i class="bi bi-speedometer2"></i> 管理员面板</h3>
+
+<h5 class="mt-2 mb-3 text-muted">系统管理</h5>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-primary mb-3 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-people display-4"></i>
+                <h5><a class="text-white text-decoration-none" href="{{ url_for('admin.users') }}">用户管理</a></h5>
+                <p class="small mb-0">查看/删除用户</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-success mb-3 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-shield display-4"></i>
+                <h5><a class="text-white text-decoration-none" href="{{ url_for('admin.teams') }}">车队管理</a></h5>
+                <p class="small mb-0">添加/编辑/删除车队</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-warning mb-3 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-geo-alt display-4"></i>
+                <h5><a class="text-dark text-decoration-none" href="{{ url_for('admin.tracks') }}">赛道管理</a></h5>
+                <p class="small mb-0">赛道管理</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h5 class="mt-2 mb-3 text-muted">赛事管理</h5>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card text-bg-danger mb-3 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check display-4"></i>
+                <h5><a class="text-white text-decoration-none" href="{{ url_for('admin.races') }}"
+                       data-testid="admin-races-link">大奖赛管理</a></h5>
+                <p class="small mb-0">创建/编辑大奖赛日程</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-bg-info mb-3 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-clipboard-data display-4"></i>
+                <h5>成绩录入</h5>
+                <p class="small mb-0">从大奖赛列表进入各站录入/编辑/删除成绩</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

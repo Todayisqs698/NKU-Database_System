@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}车队管理 - F1{% endblock %}
+{% block content %}
+<h4 class="border-bottom pb-2 mb-3">车队管理</h4>
+<button class="btn btn-danger btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#teamModal">+ 添加车队</button>
+<table class="table table-hover table-striped">
+    <thead class="table-dark"><tr><th>ID</th><th>名称</th><th>地址</th><th>领队</th><th>操作</th></tr></thead>
+    <tbody>
+        {% for t in teams %}
+        <tr>
+            <td>{{ t.team_id }}</td><td>{{ t.team_name }}</td><td>{{ t.team_address }}</td><td>{{ t.team_leader }}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editTeam{{ t.team_id }}">编辑</button>
+                <form method="post" action="{{ url_for('admin.delete_team_transaction_route', team_id=t.team_id) }}" style="display:inline">
+                    <button class="btn btn-sm btn-danger"
+                            onclick="return confirm('确认删除该车队及其全部车手/成绩/子表记录?')">删除</button>
+                </form>
+            </td>
+        </tr>
+        <!-- Edit modal -->
+        <div class="modal fade" id="editTeam{{ t.team_id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <form method="post" action="{{ url_for('admin.edit_team', team_id=t.team_id) }}">
+                    <div class="modal-header"><h5>编辑车队</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <input class="form-control mb-2" name="name" value="{{ t.team_name }}" required>
+                        <input class="form-control mb-2" name="address" value="{{ t.team_address }}" required>
+                        <input class="form-control mb-2" name="leader" value="{{ t.team_leader }}" required>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">保存</button></div>
+                </form>
+            </div></div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Add modal -->
+<div class="modal fade" id="teamModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <form method="post" action="{{ url_for('admin.add_team') }}">
+            <div class="modal-header"><h5>添加车队</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <input class="form-control mb-2" name="name" placeholder="车队名称 *" required>
+                <input class="form-control mb-2" name="address" placeholder="总部地址 *" required>
+                <input class="form-control mb-2" name="leader" placeholder="领队姓名 *" required>
+                <hr>
+                <p class="text-muted small mb-2">领队登录账号 (选填，填写后自动创建Steward账号)</p>
+                <input class="form-control mb-2" name="steward_user" placeholder="登录用户名">
+                <input class="form-control mb-2" name="steward_pass" placeholder="登录密码" type="password">
+            </div>
+            <div class="modal-footer"><button class="btn btn-primary">添加</button></div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

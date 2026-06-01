@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ '注册' if register else '登录' }} - F1 赛事管理系统{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">{{ '注册新账号' if register else '用户登录' }}</h3>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">用户名</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">
+                        {{ '注册' if register else '登录' }}
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    {% if register %}
+                    <a href="{{ url_for('auth.login') }}">已有账号？去登录</a>
+                    {% else %}
+                    <a href="{{ url_for('auth.register') }}">没有账号？去注册</a>
+                    {% endif %}
+                </div>
+                {% if not register %}
+                <hr>
+                <p class="text-muted small mb-2 text-center">测试账号 (密码均为 123456)</p>
+                <table class="table table-sm small table-borderless mb-0">
+                    <thead><tr><th>用户名</th><th>角色</th><th>车队</th></tr></thead>
+                    <tbody>
+                        <tr><td>admin</td><td>Admin</td><td>-</td></tr>
+                        <tr><td>steward1</td><td>Steward</td><td>Red Bull</td></tr>
+                        <tr><td>steward2</td><td>Steward</td><td>Mercedes</td></tr>
+                        <tr><td>steward3</td><td>Steward</td><td>Ferrari</td></tr>
+                        <tr><td>steward4</td><td>Steward</td><td>McLaren</td></tr>
+                        <tr><td>steward5</td><td>Steward</td><td>Aston Martin</td></tr>
+                        <tr><td>guest1</td><td>Guest</td><td>-</td></tr>
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

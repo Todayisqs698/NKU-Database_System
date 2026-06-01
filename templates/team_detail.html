@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ team.team_name }} - F1{% endblock %}
+{% block content %}
+<h4>{{ team.team_name }}</h4>
+<p>领队: {{ team.team_leader }} | 总部: {{ team.team_address }}</p>
+<h5 class="mt-4">车队车手</h5>
+<table class="table table-sm table-hover">
+    <thead><tr><th>车号</th><th>姓名</th><th>国籍</th></tr></thead>
+    <tbody>{% for d in drivers %}<tr><td>{{ d.driver_num }}</td><td>{{ d.driver_name }}</td><td>{{ d.driver_nation }}</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

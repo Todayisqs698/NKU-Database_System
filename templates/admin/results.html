@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ race.gp_name }} 成绩管理 - F1{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-3">
+    <a href="{{ url_for('admin.races') }}" class="btn btn-sm btn-outline-secondary me-2">
+        <i class="bi bi-arrow-left"></i> 返回
+    </a>
+    <h4 class="mb-0" data-testid="race-title">{{ race.gp_name }}</h4>
+</div>
+<p class="text-muted small">
+    <i class="bi bi-calendar"></i> {{ race.gp_date }} &nbsp;
+    <i class="bi bi-pin-map"></i> {{ race.track_name }} ({{ race.track_city }}) &nbsp;
+    <i class="bi bi-speedometer"></i> {{ race.gp_laps }} 圈
+</p>
+
+<!-- 录入成绩按钮 -->
+<button class="btn btn-success btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#addResultModal"
+        data-testid="add-result-btn">
+    <i class="bi bi-plus-lg"></i> 录入成绩
+</button>
+
+<!-- 成绩表格 -->
+<table class="table table-sm table-hover table-striped" data-testid="result-table">
+    <thead class="table-dark">
+        <tr><th>名次</th><th>车手</th><th>积分</th><th>最快圈</th><th>完赛时间</th><th>处罚</th><th>操作</th></tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr data-testid="result-row-{{ r.result_id }}">
+            <td><strong>P{{ r.result_rank }}</strong></td>
+            <td>{{ r.driver_name }} <span class="text-muted">#{{ r.driver_num }}</span> <small class="text-muted">{{ r.team_name }}</small></td>
+            <td><strong>{{ r.result_points }}</strong> pts</td>
+            <td>{{ r.fastest_lap or '-' }}</td>
+            <td>{{ r.finish_time or '-' }}</td>
+            <td>{{ r.penalty_info or '-' }}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                        data-bs-target="#editResult{{ r.result_id }}"
+                        data-testid="edit-result-btn-{{ r.result_id }}">编辑</button>
+                <form method="post" action="{{ url_for('admin.delete_result_route', result_id=r.result_id) }}"
+                      style="display:inline" data-testid="delete-result-form-{{ r.result_id }}">
+                    <input type="hidden" name="gp_id" value="{{ race.gp_id }}">
+                    <button class="btn btn-sm btn-outline-danger"
+                            data-testid="delete-result-btn-{{ r.result_id }}"
+                            onclick="return confirm('确认删除 {{ r.driver_name }} 的成绩?')">删除</button>
+                </form>
+            </td>
+        </tr>
+        <!-- 编辑 Modal -->
+        <div class="modal fade" id="editResult{{ r.result_id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <form method="post" action="{{ url_for('admin.edit_result', result_id=r.result_id) }}"
+                      data-testid="edit-result-form-{{ r.result_id }}">
+                    <input type="hidden" name="gp_id" value="{{ race.gp_id }}">
+                    <div class="modal-header"><h5>编辑成绩</h5></div>
+                    <div class="modal-body">
+                        <label class="small">名次 <span class="text-muted">(≥ 1)</span></label>
+                        <input class="form-control mb-2" name="rank" type="number" min="1" value="{{ r.result_rank }}" required
+                               oninvalid="this.setCustomValidity('名次必须为正整数（≥1）')" oninput="this.setCustomValidity('')">
+                        <label class="small">积分 <span class="text-muted">(0 ~ 25)</span></label>
+                        <input class="form-control mb-2" name="points" type="number" value="{{ r.result_points }}" required
+                               oninvalid="this.setCustomValidity('积分不能为负数')" oninput="this.setCustomValidity('')">
+                        <label class="small">最快单圈</label>
+                        <input class="form-control mb-2" name="fastest_lap" value="{{ r.fastest_lap or '' }}" placeholder="mm:ss.xxx">
+                        <label class="small">完赛时间</label>
+                        <input class="form-control mb-2" name="finish_time" value="{{ r.finish_time or '' }}">
+                        <label class="small">处罚信息</label>
+                        <input class="form-control mb-2" name="penalty" value="{{ r.penalty_info or '' }}">
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">保存修改</button></div>
+                </form>
+            </div></div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 录入成绩 Modal -->
+<div class="modal fade" id="addResultModal" tabindex="-1" data-testid="add-result-modal">
+    <div class="modal-dialog"><div class="modal-content">
+        <form method="post" action="{{ url_for('admin.add_result', gp_id=race.gp_id) }}" data-testid="add-result-form">
+            <div class="modal-header bg-success text-white">
+                <h5>录入成绩 — {{ race.gp_name }}</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="small">车手</label>
+                <select class="form-control mb-2" name="driver_id" required data-testid="result-driver-select">
+                    <option value="">-- 选择车手 --</option>
+                    {% for d in drivers %}
+                    <option value="{{ d.driver_id }}">{{ d.driver_name }} (#{{ d.driver_num }}) - {{ d.team_name }}</option>
+                    {% endfor %}
+                </select>
+                <label class="small">名次 <span class="text-muted">(≥ 1)</span></label>
+                <input class="form-control mb-2" name="rank" type="number" min="1" placeholder="名次" required data-testid="result-rank-input"
+                       oninvalid="this.setCustomValidity('名次必须为正整数（≥1）')" oninput="this.setCustomValidity('')">
+                <label class="small">积分 <span class="text-muted">(0 ~ 25，超出将被存储过程拒绝)</span></label>
+                <input class="form-control mb-2" name="points" type="number" min="0" placeholder="积分（0~25）" required data-testid="result-points-input"
+                       oninvalid="this.setCustomValidity('积分不能为负数')" oninput="this.setCustomValidity('')">
+                <label class="small">最快单圈 (可选)</label>
+                <input class="form-control mb-2" name="fastest_lap" placeholder="mm:ss.xxx">
+                <label class="small">完赛时间 (可选)</label>
+                <input class="form-control mb-2" name="finish_time">
+                <label class="small">处罚信息 (可选)</label>
+                <input class="form-control mb-2" name="penalty">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-success" data-testid="confirm-add-result-btn">确认录入</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

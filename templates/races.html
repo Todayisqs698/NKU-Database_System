@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}赛事列表{% endblock %}
+{% block content %}
+
+<!-- ======== 页面标题 ======== -->
+<div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0">
+        <i class="bi bi-flag-fill text-danger"></i> 大奖赛日程
+    </h3>
+</div>
+
+<!-- ======== 控制面板 ======== -->
+<div class="card shadow-sm mb-4" data-testid="control-panel">
+    <div class="card-header bg-light fw-bold">
+        <i class="bi bi-funnel-fill text-primary"></i> 检索日程
+    </div>
+    <div class="card-body">
+        <form class="row g-3 align-items-end" method="get" data-testid="search-form">
+            <!-- 赛季年份 -->
+            <div class="col-md-3">
+                <label for="seasonSelect" class="form-label fw-bold small text-muted">
+                    <i class="bi bi-calendar3"></i> 赛季年份
+                </label>
+                <select name="season" id="seasonSelect"
+                        class="form-select" data-testid="season-select">
+                    <option value="">全部赛季</option>
+                    {% for y in [2024, 2025, 2026] %}
+                    <option value="{{ y }}" {% if season == y|string %}selected{% endif %}>
+                        {{ y }} 赛季
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 赛道城市 -->
+            <div class="col-md-3">
+                <label for="cityInput" class="form-label fw-bold small text-muted">
+                    <i class="bi bi-geo-alt-fill"></i> 赛道城市
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input name="city" id="cityInput"
+                           class="form-control" list="citySuggest"
+                           value="{{ city }}"
+                           placeholder="输入城市名（模糊匹配）"
+                           data-testid="city-input">
+                    <datalist id="citySuggest">
+                        {% for c in cities %}
+                        <option value="{{ c }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"
+                        data-testid="query-btn">
+                    <i class="bi bi-search"></i> 检索日程
+                </button>
+                <a href="{{ url_for('public.races') }}"
+                   class="btn btn-outline-secondary"
+                   data-testid="reset-btn">
+                    <i class="bi bi-arrow-counterclockwise"></i> 重置
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======== 当前筛选状态 ======== -->
+{% if season or city %}
+<div class="alert alert-info py-2 small d-flex align-items-center" data-testid="filter-status">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    当前筛选：
+    {% if season %}<span class="badge bg-primary me-1">赛季 {{ season }}</span>{% endif %}
+    {% if city %}<span class="badge bg-success">城市: {{ city }}</span>{% endif %}
+</div>
+{% endif %}
+
+<!-- ======== 赛事结果表格 ======== -->
+{% if races %}
+<div class="card shadow-sm rounded-0" data-testid="race-table-card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped table-bordered mb-0"
+                   data-testid="race-table">
+                <thead class="table-dark text-center align-middle">
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 28%;">大奖赛名称</th>
+                        <th style="width: 10%;">赛季</th>
+                        <th style="width: 15%;">举办日期</th>
+                        <th style="width: 22%;">赛道名称</th>
+                        <th style="width: 10%;">所在城市</th>
+                        <th style="width: 10%;">操作</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle">
+                    {% for r in races %}
+                    <tr data-testid="race-row-{{ loop.index }}"
+                        class="{% if loop.index % 2 == 0 %}table-light-hover{% endif %}">
+                        <td class="text-center fw-bold text-muted">{{ loop.index }}</td>
+                        <td>
+                            <span class="fw-semibold">{{ r.gp_name }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary">{{ r.gp_season }}</span>
+                        </td>
+                        <td class="text-center">
+                            <i class="bi bi-calendar-week text-muted me-1 small"></i>
+                            {{ r.gp_date }}
+                        </td>
+                        <td>
+                            <i class="bi bi-pin-map-fill text-danger me-1 small"></i>
+                            {{ r.track_name }}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ r.track_city }}</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('public.race_detail', gp_id=r.gp_id) }}"
+                               class="btn btn-sm btn-outline-danger stretched-link-decoration-none"
+                               data-testid="race-detail-btn-{{ r.gp_id }}">
+                                <i class="bi bi-bar-chart-fill"></i> 详情
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- ======== 空结果 ======== -->
+<div class="text-center py-5" data-testid="empty-result">
+    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+    <p class="text-muted mt-2 fs-5">未找到符合条件的赛事</p>
+    <p class="text-muted small">请尝试调整筛选条件或
+        <a href="{{ url_for('public.races') }}">重置</a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* 表格行 hover 高亮变色效果 */
+    .table-hover tbody tr:hover {
+        background-color: #fff3cd !important;
+        transition: background-color 0.2s ease;
+    }
+    /* 斑马纹加强 */
+    .table-striped > tbody > tr:nth-of-type(odd) > * {
+        --bs-table-bg: #f8f9fa;
+    }
+    .table-striped > tbody > tr:nth-of-type(even) > * {
+        --bs-table-bg: #ffffff;
+    }
+</style>
+{% endblock %}

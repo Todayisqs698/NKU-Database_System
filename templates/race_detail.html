@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ race.gp_name }} - F1{% endblock %}
+{% block content %}
+<h4>{{ race.gp_name }}</h4>
+<p>{{ race.gp_date }} | 赛季: {{ race.gp_season }} | 圈数: {{ race.gp_laps }}</p>
+<p>赛道: {{ race.track_name }} ({{ race.track_city }}) 长度: {{ race.track_length }} km</p>
+<p>审核人: {{ race.auditor_name }}</p>
+<h5 class="mt-4">比赛结果</h5>
+<table class="table table-sm table-striped table-hover">
+    <thead class="table-dark">
+        <tr><th>名次</th><th>车手</th><th>车号</th><th>车队</th><th>积分</th><th>最快圈</th><th>完赛时间</th><th>处罚</th></tr>
+    </thead>
+    <tbody>
+        {% for r in results %}
+        <tr>
+            <td><strong>{{ r.result_rank }}</strong></td>
+            <td>{{ r.driver_name }}</td>
+            <td>{{ r.driver_num }}</td>
+            <td>{{ r.team_name }}</td>
+            <td>{{ r.result_points }}</td>
+            <td>{{ r.fastest_lap or '-' }}</td>
+            <td>{{ r.finish_time or '-' }}</td>
+            <td>{{ r.penalty_info or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

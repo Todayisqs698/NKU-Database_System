@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}积分榜 {{ season }} - F1{% endblock %}
+{% block content %}
+
+<!-- ======== 赛季切换 Tab ======== -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link {% if season == 2024 %}active{% endif %}"
+           href="?season=2024">2024 赛季</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if season == 2025 %}active{% endif %}"
+           href="?season=2025">2025 赛季</a>
+    </li>
+</ul>
+
+<div class="row">
+    <!-- 车手积分榜 -->
+    <div class="col-md-7">
+        <h4 class="border-bottom pb-2 mb-3">🏎️ 车手积分榜 - {{ season }} 赛季</h4>
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr><th>排名</th><th>车手</th><th>车号</th><th>车队</th><th>积分</th><th>胜场</th></tr>
+            </thead>
+            <tbody>
+                {% for s in driver_standings %}
+                <tr class="{% if s.wins > 0 %}table-warning{% endif %}">
+                    <td><strong>{{ loop.index }}</strong></td>
+                    <td>
+                        {% if s.wins > 0 %}🏆{% endif %}
+                        {{ s.driver_name }}
+                    </td>
+                    <td>{{ s.driver_num }}</td>
+                    <td>{{ s.team_name }}</td>
+                    <td><strong>{{ s.total_points }}</strong></td>
+                    <td>{{ s.wins }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 车队积分榜 -->
+    <div class="col-md-5">
+        <h4 class="border-bottom pb-2 mb-3">🏁 车队积分榜</h4>
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr><th>排名</th><th>车队</th><th>积分</th></tr>
+            </thead>
+            <tbody>
+                {% for t in team_standings %}
+                <tr>
+                    <td><strong>{{ loop.index }}</strong></td>
+                    <td>{{ t.team_name }}</td>
+                    <td>
+                        <strong>{{ t.total_points }}</strong>
+                        {% if t.total_points == 0 %}
+                        <span class="text-muted small">pts</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

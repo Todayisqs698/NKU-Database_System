@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}大奖赛管理 - 管理员 - F1{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center mb-3">
+    <h4 class="mb-0"><i class="bi bi-calendar-check text-danger"></i> 大奖赛管理</h4>
+    <span class="badge bg-secondary ms-3">{{ races|length }} 场比赛</span>
+</div>
+
+<!-- 赛季筛选 + 添加按钮 -->
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        <a href="?season=2024" class="btn btn-sm {% if season==2024 or not season %}btn-primary{% else %}btn-outline-primary{% endif %}">2024</a>
+        <a href="?season=2025" class="btn btn-sm {% if season==2025 %}btn-primary{% else %}btn-outline-primary{% endif %}">2025</a>
+        <a href="?season=2026" class="btn btn-sm {% if season==2026 %}btn-primary{% else %}btn-outline-primary{% endif %}">2026</a>
+        <a href="{{ url_for('admin.races') }}" class="btn btn-sm btn-outline-secondary">全部</a>
+    </div>
+    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRaceModal"
+            data-testid="add-race-btn">
+        <i class="bi bi-plus-lg"></i> 添加大奖赛
+    </button>
+</div>
+
+<!-- 赛事列表 -->
+<table class="table table-hover table-striped" data-testid="race-table">
+    <thead class="table-dark">
+        <tr><th>ID</th><th>名称</th><th>日期</th><th>赛季</th><th>圈数</th><th>赛道</th><th>操作</th></tr>
+    </thead>
+    <tbody>
+        {% for r in races %}
+        <tr data-testid="race-row-{{ r.gp_id }}">
+            <td>{{ r.gp_id }}</td>
+            <td>{{ r.gp_name }}</td>
+            <td>{{ r.gp_date }}</td>
+            <td><span class="badge bg-secondary">{{ r.gp_season }}</span></td>
+            <td>{{ r.gp_laps }}</td>
+            <td>{{ r.track_name }}</td>
+            <td>
+                <a href="{{ url_for('admin.results', gp_id=r.gp_id) }}"
+                   class="btn btn-sm btn-outline-info"
+                   data-testid="results-btn-{{ r.gp_id }}">成绩</a>
+                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                        data-bs-target="#editRace{{ r.gp_id }}"
+                        data-testid="edit-race-btn-{{ r.gp_id }}">编辑</button>
+            </td>
+        </tr>
+        <!-- 编辑 Modal -->
+        <div class="modal fade" id="editRace{{ r.gp_id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+                <form method="post" action="{{ url_for('admin.edit_race', gp_id=r.gp_id) }}">
+                    <div class="modal-header"><h5>编辑大奖赛 #{{ r.gp_id }}</h5></div>
+                    <div class="modal-body">
+                        <input class="form-control mb-2" name="name" value="{{ r.gp_name }}" required>
+                        <input class="form-control mb-2" name="date" type="date" value="{{ r.gp_date }}" required>
+                        <input class="form-control mb-2" name="season" type="number" value="{{ r.gp_season }}" required>
+                        <input class="form-control mb-2" name="laps" type="number" value="{{ r.gp_laps }}" required>
+                        <select class="form-control mb-2" name="track_id">
+                            {% for t in tracks %}
+                            <option value="{{ t.track_id }}" {% if t.track_id==r.track_id %}selected{% endif %}>{{ t.track_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer"><button class="btn btn-primary">保存</button></div>
+                </form>
+            </div></div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 添加大奖赛 Modal -->
+<div class="modal fade" id="addRaceModal" tabindex="-1" data-testid="add-race-modal">
+    <div class="modal-dialog"><div class="modal-content">
+        <form method="post" action="{{ url_for('admin.add_race') }}" data-testid="add-race-form">
+            <div class="modal-header bg-success text-white">
+                <h5>添加大奖赛</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input class="form-control mb-2" name="name" placeholder="比赛名称" required data-testid="race-name-input">
+                <input class="form-control mb-2" name="date" type="date" required data-testid="race-date-input">
+                <input class="form-control mb-2" name="season" type="number" placeholder="赛季年份" required data-testid="race-season-input">
+                <input class="form-control mb-2" name="laps" type="number" placeholder="圈数" required data-testid="race-laps-input">
+                <select class="form-control mb-2" name="track_id" required data-testid="race-track-select">
+                    <option value="">-- 选择赛道 --</option>
+                    {% for t in tracks %}
+                    <option value="{{ t.track_id }}">{{ t.track_name }} ({{ t.track_city }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-success" data-testid="confirm-add-race-btn">添加</button>
+            </div>
+        </form>
+    </div></div>
+</div>
+{% endblock %}

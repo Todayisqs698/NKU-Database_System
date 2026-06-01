@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}领队面板 - {{ team_name }} - F1{% endblock %}
+{% block content %}
+
+<!-- ======== 三张数据卡片：等高 + 内容居中 ======== -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card shadow-sm border-danger h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                <i class="bi bi-shield-fill text-danger display-4"></i>
+                <h4 class="mt-2 mb-1" data-testid="team-name">{{ team_name }}</h4>
+                <p class="text-muted mb-0">领队: <strong data-testid="team-leader">{{ team_leader }}</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="card shadow-sm border-primary h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                <i class="bi bi-people-fill text-primary display-4"></i>
+                <h4 class="mt-2 mb-1" data-testid="driver-count">{{ drivers_count }}</h4>
+                <p class="text-muted mb-0">现役车手</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-success h-100">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                <i class="bi bi-person-plus-fill text-success display-4"></i>
+                <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addDriverModal"
+                        data-testid="add-driver-btn">
+                    <i class="bi bi-plus-lg"></i> 签约车手
+                </button>
+                <p class="text-muted small mb-0 mt-1">触发年龄校验 (≥18岁)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======== 旗下车手表格 ======== -->
+<div class="card shadow-sm" data-testid="driver-table-card">
+    <div class="card-header bg-dark text-white fw-bold">
+        <i class="bi bi-flag-fill text-danger"></i> {{ team_name }} 车手阵容
+    </div>
+    <div class="card-body p-0">
+        {% if drivers %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0" data-testid="driver-table">
+                <thead class="table-dark text-center align-middle">
+                    <tr>
+                        <th>车号</th>
+                        <th>姓名</th>
+                        <th>国籍</th>
+                        <th>年龄</th>
+                        <th>类型</th>
+                        <th>薪资/测试</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle">
+                    {% for d in drivers %}
+                    <tr data-testid="driver-row-{{ d.driver_id }}">
+                        <td class="text-center"><strong>#{{ d.driver_num }}</strong></td>
+                        <td>
+                            <a href="{{ url_for('public.driver_detail', driver_id=d.driver_id) }}">
+                                {{ d.driver_name }}
+                            </a>
+                        </td>
+                        <td>{{ d.driver_nation }}</td>
+                        <td class="text-center">
+                            {% if d.driver_age < 18 %}
+                            <span class="badge bg-danger">⚠ {{ d.driver_age }}</span>
+                            {% else %}
+                            {{ d.driver_age }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if d.driver_type == '全职' %}
+                            <span class="badge bg-primary">全职车手</span>
+                            {% else %}
+                            <span class="badge bg-secondary">储备车手</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if d.driver_salary %}¥{{ d.driver_salary }}万/年
+                            {% elif d.test_hours %}{{ d.test_hours }}h
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="text-center">
+                            <form method="post"
+                                  action="{{ url_for('steward.delete_driver_route', driver_id=d.driver_id) }}"
+                                  onsubmit="return confirm('确认解约车手 {{ d.driver_name }} (#{{ d.driver_num }})？\n\n相关比赛成绩也将被清除。')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        data-testid="delete-driver-btn-{{ d.driver_id }}">
+                                    <i class="bi bi-person-x-fill"></i> 解约
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted" data-testid="empty-drivers">
+            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+            <p class="mt-2">暂无车手，请签约新成员</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ======== 签约车手 Modal ======== -->
+<div class="modal fade" id="addDriverModal" tabindex="-1" data-testid="add-driver-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{{ url_for('steward.add_driver') }}" data-testid="add-driver-form">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus"></i> 签约新车手 — {{ team_name }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold">姓名 *</label>
+                            <input name="name" class="form-control" required
+                                   placeholder="车手姓名" data-testid="driver-name-input">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">车号 *</label>
+                            <input name="num" type="number" class="form-control" required
+                                   placeholder="如 99" data-testid="driver-num-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">国籍 *</label>
+                            <input name="nation" class="form-control" required
+                                   placeholder="如 British" data-testid="driver-nation-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">
+                                年龄 *
+                                <span class="text-danger">(触发器: ≥18)</span>
+                            </label>
+                            <input name="age" type="number" class="form-control" required
+                                   min="18" value="22" data-testid="driver-age-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">车手类型</label>
+                            <select name="driver_type" class="form-select"
+                                    onchange="toggleDriverFields(this.value)"
+                                    data-testid="driver-type-select">
+                                <option value="fulltime">全职车手</option>
+                                <option value="reserve">储备车手</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="salaryField">
+                            <label class="form-label small fw-bold">年薪 (万元)</label>
+                            <input name="salary" type="number" step="0.01" class="form-control"
+                                   value="500.00" data-testid="driver-salary-input">
+                        </div>
+                        <div class="col-md-6" id="testHoursField" style="display:none;">
+                            <label class="form-label small fw-bold">测试时长 (小时)</label>
+                            <input name="test_hours" type="number" step="0.1" class="form-control"
+                                   value="50.0" data-testid="driver-hours-input">
+                        </div>
+                    </div>
+                    <div class="alert alert-warning py-1 px-2 mt-2 mb-0 small">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        年龄不足18岁将触发 <strong>before_driver_insert</strong> 触发器拒绝插入
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success" data-testid="confirm-add-btn">
+                        <i class="bi bi-check-lg"></i> 确认签约
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleDriverFields(type) {
+    document.getElementById('salaryField').style.display = (type === 'fulltime') ? '' : 'none';
+    document.getElementById('testHoursField').style.display = (type === 'reserve') ? '' : 'none';
+}
+</script>
+{% endblock %}
