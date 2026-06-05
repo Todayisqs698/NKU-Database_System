@@ -59,8 +59,7 @@
                         <input class="form-control mb-2" name="rank" type="number" min="1" value="{{ r.result_rank }}" required
                                oninvalid="this.setCustomValidity('名次必须为正整数（≥1）')" oninput="this.setCustomValidity('')">
                         <label class="small">积分 <span class="text-muted">(0 ~ 25)</span></label>
-                        <input class="form-control mb-2" name="points" type="number" value="{{ r.result_points }}" required
-                               oninvalid="this.setCustomValidity('积分不能为负数')" oninput="this.setCustomValidity('')">
+                        <input class="form-control mb-2" name="points" type="number" value="{{ r.result_points }}" required>
                         <label class="small">最快单圈</label>
                         <input class="form-control mb-2" name="fastest_lap" value="{{ r.fastest_lap or '' }}" placeholder="mm:ss.xxx">
                         <label class="small">完赛时间</label>
@@ -82,7 +81,7 @@
         <form method="post" action="{{ url_for('admin.add_result', gp_id=race.gp_id) }}" data-testid="add-result-form">
             <div class="modal-header bg-success text-white">
                 <h5>录入成绩 — {{ race.gp_name }}</h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <label class="small">车手</label>
@@ -95,9 +94,8 @@
                 <label class="small">名次 <span class="text-muted">(≥ 1)</span></label>
                 <input class="form-control mb-2" name="rank" type="number" min="1" placeholder="名次" required data-testid="result-rank-input"
                        oninvalid="this.setCustomValidity('名次必须为正整数（≥1）')" oninput="this.setCustomValidity('')">
-                <label class="small">积分 <span class="text-muted">(0 ~ 25，超出将被存储过程拒绝)</span></label>
-                <input class="form-control mb-2" name="points" type="number" min="0" placeholder="积分（0~25）" required data-testid="result-points-input"
-                       oninvalid="this.setCustomValidity('积分不能为负数')" oninput="this.setCustomValidity('')">
+                <label class="small">积分 <span class="text-muted">(0 ~ 25)</span></label>
+                <input class="form-control mb-2" name="points" type="number" placeholder="积分" required data-testid="result-points-input">
                 <label class="small">最快单圈 (可选)</label>
                 <input class="form-control mb-2" name="fastest_lap" placeholder="mm:ss.xxx">
                 <label class="small">完赛时间 (可选)</label>

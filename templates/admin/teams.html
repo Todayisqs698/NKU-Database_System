@@ -21,7 +21,7 @@
         <div class="modal fade" id="editTeam{{ t.team_id }}" tabindex="-1">
             <div class="modal-dialog"><div class="modal-content">
                 <form method="post" action="{{ url_for('admin.edit_team', team_id=t.team_id) }}">
-                    <div class="modal-header"><h5>编辑车队</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-header"><h5>编辑车队</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                     <div class="modal-body">
                         <input class="form-control mb-2" name="name" value="{{ t.team_name }}" required>
                         <input class="form-control mb-2" name="address" value="{{ t.team_address }}" required>
@@ -38,7 +38,7 @@
 <div class="modal fade" id="teamModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content">
         <form method="post" action="{{ url_for('admin.add_team') }}">
-            <div class="modal-header"><h5>添加车队</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5>添加车队</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <input class="form-control mb-2" name="name" placeholder="车队名称 *" required>
                 <input class="form-control mb-2" name="address" placeholder="总部地址 *" required>

@@ -185,12 +185,15 @@ def results(gp_id):
 @login_required
 @role_required('Admin')
 def add_result(gp_id):
-    create_result(request.form['rank'], request.form['points'],
-                  request.form.get('fastest_lap') or None,
-                  request.form.get('finish_time') or None,
-                  request.form.get('penalty') or None,
-                  request.form['driver_id'], gp_id)
-    flash('成绩录入成功', 'success')
+    try:
+        create_result(request.form['rank'], request.form['points'],
+                      request.form.get('fastest_lap') or None,
+                      request.form.get('finish_time') or None,
+                      request.form.get('penalty') or None,
+                      request.form['driver_id'], gp_id)
+        flash('成绩录入成功', 'success')
+    except Exception as e:
+        flash(f'数据库校验拒绝: {e}', 'danger')
     return redirect(url_for('admin.results', gp_id=gp_id))
 
 @admin_bp.route('/results/edit/<int:result_id>', methods=['POST'])
@@ -198,11 +201,14 @@ def add_result(gp_id):
 @role_required('Admin')
 def edit_result(result_id):
     gp_id = request.form['gp_id']
-    update_result(result_id, request.form['rank'], request.form['points'],
-                  request.form.get('fastest_lap') or None,
-                  request.form.get('finish_time') or None,
-                  request.form.get('penalty') or None)
-    flash('成绩修改成功', 'success')
+    try:
+        update_result(result_id, request.form['rank'], request.form['points'],
+                      request.form.get('fastest_lap') or None,
+                      request.form.get('finish_time') or None,
+                      request.form.get('penalty') or None)
+        flash('成绩修改成功', 'success')
+    except Exception as e:
+        flash(f'数据库校验拒绝: {e}', 'danger')
     return redirect(url_for('admin.results', gp_id=gp_id))
 
 @admin_bp.route('/results/delete/<int:result_id>', methods=['POST'])
